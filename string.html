@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>JavaScript字符串操作训练</title>
+</head>
+<body>
+    <div>
+        <h1>JavaScript字符串操作训练</h1>
+       身份证号:<input id="idcard" type="text"><span class="idcard-error"></span>
+       <div class="info" style="display: none;">
+            <div>
+                    生日: <span class="year"></span>年
+                    <span class="month"></span>月
+                    <span class="day"></span>日
+            </div>
+            <div>性别：男<input type="radio" name="sex" class="m">女<input name="sex" class="f" type="radio"></div>
+       </div>
+    </div>
+
+
+    <script>
+        // 0. 用js将h1标签的文字改成蓝色，字体为黑体，加粗，字体大小为18px
+        var h1 = document.getElementsByTagName("h1")
+        console.log(h1)
+        h1[0].style.fontFamily = "黑体"
+        h1[0].style.fontWeight = "bold"
+        h1[0].style.color = "blue"
+        h1[0].style.fontSize = "18"
+        // 1. 给id为idcard的input失去焦点时，自动将输入的内容，转为大写
+        var idcard = document.getElementById("idcard")
+        console.log(idcard)
+        idcard.onchange = function (event) {
+            idcard.value = idcard.value.toUpperCase()
+
+            var idcard_error = document.getElementsByClassName("idcard-error")
+//            var idcard_error_html = idcard_error[0].innerHTML
+            var str = idcard.value
+            // 2. 用字符串相关函数，按下面的要求检查输入的内容是否符合规则:
+            // 2.1 长度为18位
+            var isStrLen = str.length == 18
+            idcard_error[0].style.color = "red"
+            if (!isStrLen) {
+
+                idcard_error[0].innerHTML = "长度不为18位,"
+            }
+
+            var strSub = str.substring(0, str.length-1)
+            for (var i = 0; i < str.length; ++i) {
+
+                if (i==17) {
+
+                    // 2.2 除最后一位允许是大写X，其它位置只能是数字
+                    if (isNaN(Number(str[i]))) {
+
+                        if (str[i] != "X"){
+                            idcard_error[0].innerHTML = "最后一位允许是大写X,"
+                            return
+                        }
+                    }
+                }
+                else if (isNaN(Number(str[i]))) {
+                    idcard_error[0].innerHTML = "只能是数字,"
+                    return
+                }
+            }
+            // 2.3 不能以0开头
+            var strIndex = str[0]
+            if (Number(strIndex) == 0) {
+                idcard_error[0].innerHTML = "不能以0开头,"
+                return
+            }
+            // 2.4 将身份证中的生日提取出来，判断年龄是否 >=18 并 <=55
+            // 2.5 判断月份是否合法
+            // 2.6 判断日期是否合法
+            var strBirthDate = str.substr(6, 8)
+//            console.log(strBirthDate)
+            var birthYear = strBirthDate.substr(0, 4)
+//            console.log(birthYear)
+            var birthMonth = strBirthDate.substr(4, 2)
+//            console.log(birthMonth)
+            var BirthDay = strBirthDate.substr(6, 2)
+//            console.log(BirthDay)
+            var nowDate = new Date()
+//            console.log(nowDate.getFullYear())
+            var year = nowDate.getFullYear()
+            var diff = (Number(year) - Number(birthYear))
+            if (diff< 18 || diff > 55) {
+                idcard_error[0].innerHTML = "年龄不在18~55岁之间,"
+                return
+            }
+            var runYear = false
+            if ((birthYear % 400==0) || (birthYear % 4 == 0 && birthYear % 100 != 0 )) {
+                runYear = true
+            }
+            var birthMonth = Number(birthMonth)
+
+            if (birthMonth <= 0 || birthMonth > 12) {
+                idcard_error[0].innerHTML = "月份不合法"
+                return
+            }
+            var BirthDay = Number(BirthDay)
+            console.log(BirthDay)
+            switch (birthMonth) {
+                case 1:
+                case 3:
+                case 5:
+                case 7:
+                case 8:
+                case 10:
+                case 12:
+                    console.log(BirthDay)
+                    if (BirthDay < 0 || BirthDay > 31){
+                        idcard_error[0].innerHTML = "日期不合法"
+                        return
+                    }
+                    break
+                case 2:
+                    if (runYear) {
+                        if (BirthDay < 0 || BirthDay > 29){
+                            idcard_error[0].innerHTML = "日期不合法"
+                            return
+                        }
+                    }else {
+                        if (BirthDay < 0 || BirthDay > 28){
+                            idcard_error[0].innerHTML = "日期不合法"
+                            return
+                        }
+                    }
+                    break
+                default:
+                    if (BirthDay < 0 || BirthDay > 30){
+                        idcard_error[0].innerHTML = "日期不合法"
+                        return
+                    }
+                    break
+
+            }
+            // 2.7 如果身份证号不符合以上要求，将错误信息放到class为idcard-error的span标签中，将提示文字改成红色
+            //     如果符合以上要求，在idcard-error中放入“验证成功”，颜色为绿色
+            idcard_error[0].style.color = "green"
+            idcard_error[0].innerHTML = "验证成功"
+            // 3. 将 info 显示出来，并将年月日信息，放到对应的span标签中
+            var info = document.getElementsByClassName("info")
+            info[0].style.display = "block"
+
+            var spanYear = document.getElementsByClassName("year")
+            spanYear[0].innerHTML = birthYear
+            var spanMonth = document.getElementsByClassName("month")
+            spanMonth[0].innerHTML = birthMonth
+            var spanDay = document.getElementsByClassName("day")
+            spanDay[0].innerHTML = BirthDay
+
+            // 4. 第17位数字代表性别，奇数为男，偶数为女，选中对应性别项
+            var strL = Number(str[16])
+            if (strL % 2 == 0){
+                var m = document.getElementsByClassName("m")
+                m[0].checked = "checked"
+
+            } else {
+                var f = document.getElementsByClassName("f")
+                f[0].checked = "checked"
+            }
+
+        }
+
+    </script>
+</body>
+</html>
